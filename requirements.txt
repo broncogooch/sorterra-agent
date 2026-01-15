@@ -1,11 +1,11 @@
 langchain
 langchain-anthropic
 langchain-ollama
-langchain-community
 langgraph
-python-dotenv
-chromadb
-sentence-transformers
 langchain-huggingface
+langchain-community
+langchain-chroma
+python-dotenv
 pypdf
 docx2txt
+sentence-transformers

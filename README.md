@@ -1,54 +1,63 @@
-# Sorterra: Local Sorting Agent (v1.0)
+# Sorterra Agent 📂🤖
 
-**Sorterra** is a "Cloud-Ready" file management agent built using **LangGraph 1.0**. It uses an agentic loop to analyze, categorize, and move files based on a configurable "Recipe." By decoupling the file logic from the agent's brain, this system is designed to transition from your local machine to SharePoint with minimal friction.
-
----
-
-### Project Overview
-The agent operates on a **Sense-Think-Act** loop:
-1. **Sense:** The agent uses the `list_local_files` tool to see what is in your target folder.
-2. **Think:** It compares the filenames and extensions against the **Dynamic Recipe**.
-3. **Act:** It uses the `move_file` tool to execute the sorting logic.
+**Sorterra** is an intelligent, agentic file management system developed as a capstone project for the BYU MISM program. It leverages LLMs and RAG (Retrieval-Augmented Generation) to autonomously sort documents into a clean, hierarchical structure based on content analysis and historical memory.
 
 ---
 
-### File Structure
-* `sorterra_agent.py`: The main Python script containing the graph and tools.
-* `requirements.txt`: List of necessary Python libraries.
-* `.env`: Your private API keys (not to be committed to version control).
-* `test_folder/`: The local directory where the agent will perform its work.
+## 🏗️ Architecture
+
+Sorterra uses a **LangGraph** state machine to handle complex sorting logic:
+
+1. **Analyzer Node**  
+   Distills raw file content (PDF, DOCX, TXT) and retrieves *Memory Hints* from a Chroma vector store.
+
+2. **Agent Node**  
+   A reasoning engine (**Claude 3.5 Sonnet**) that applies user-defined recipes to the analysis.
+
+3. **Tool Node**  
+   Executes the physical file move and indexes the successful action into vector memory for future “learning”.
 
 ---
 
-### How to Run Locally
+## 📂 Project Structure
 
-#### 1. Prerequisites
-* **Python 3.11+**
-* **Ollama** (For local mode): Download from [ollama.com](https://ollama.com).
-* **Anthropic API Key** (For cloud mode): Get one from the [Anthropic Console](https://console.anthropic.com/).
-
-#### 2. Environment Setup
-Create a `.env` file in the root directory and add your key:
-```bash
-ANTHROPIC_API_KEY=your_key_here
+```text
+SORTERRA-AGENT/
+├── core/                # Core Agent Logic
+│   ├── agent.py         # LangGraph definition
+│   ├── schema.py        # State & Type definitions
+│   └── tools.py         # File system & Vector DB tools
+├── data/                # Local data (Git ignored)
+│   ├── test_folder/     # Input for sorting
+│   └── sorted_data/     # Structured output
+├── main.py              # System entry point
+├── .env                 # API Keys (Anthropic)
+└── requirements.txt     # Dependencies
 ```
-#### 3. Install Dependencies
+
+## 🚀 Getting Started
+
+### 1. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
-#### 4. Prepare Your Model (Local Only)
-If you set `USE_LOCAL = True` in the code, pull a reasoning model via Ollama:
+### 2. Setup Environment
+Create a .env file with your Anthropic API key:
+
+`ANTHROPIC_API_KEY=your_sk_key_here`
+
+### 3. Run the Agent
+Place files in `data/test_folder/` and run:
 
 ```bash
-ollama pull deepseek-r1:8b
+python main.py
 ```
-#### 5. Execution
-Create a folder named `test_folder`.
+🛠️ Tech Stack
+Orchestration: LangGraph / LangChain
 
-Add dummy files (e.g., january_invoice.txt, family_photo.jpg, resume.pdf).
+LLM: Anthropic Claude 3.5 Sonnet
 
-Run the agent:
+Vector DB: ChromaDB
 
-```bash
-python sorterra_agent.py
-```
+Embeddings: HuggingFace (sentence-transformers)
