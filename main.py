@@ -25,4 +25,9 @@ if __name__ == "__main__":
         
         for output in app.stream(inputs, stream_mode="updates"):
             for node, values in output.items():
-                print(f"[{node}] completed.")
+                print(f"[{node}] step finished.")
+        
+                # Log specific results from the tools node
+                if node == "tools" and "messages" in values:
+                    last_msg = values["messages"][-1]
+                    print(f"Tool Output: {last_msg.content}")

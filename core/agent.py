@@ -19,6 +19,11 @@ def analyzer_node(state: AgentState):
     past_hints = memory.get_similar_mapping(content)
     
     summary = f"FILE: {Path(file_path).name}\nPREVIEW: {content[:400]}...\nMEMORY HINTS: {past_hints}"
+    
+    #logging
+    print(f"\n--- [ANALYZER] ---")
+    print(f"File: {file_path}")
+    print(f"Memory Context: {past_hints}")
     return {"analysis_summary": summary}
 
 def sorting_agent(state: AgentState):
@@ -30,6 +35,15 @@ def sorting_agent(state: AgentState):
         "Decision Task: Use 'move_file' based on the Rules and Analysis Summary."
     ))
     response = model.invoke([system_prompt] + state['messages'])
+
+    #logging
+    print(f"\n--- [AGENT DECISION] ---")
+    if response.tool_calls:
+        for tool in response.tool_calls:
+            print(f"Action: {tool['name']}")
+            print(f"Arguments: {tool['args']}")
+    else:
+        print(f"Reasoning/Response: {response.content}")
     return {"messages": [response]}
 
 def should_continue(state: AgentState) -> Literal["tools", "__end__"]:

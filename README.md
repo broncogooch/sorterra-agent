@@ -1,10 +1,10 @@
-# Sorterra Agent 📂🤖
+# Sorterra Agent 
 
 **Sorterra** is an intelligent, agentic file management system developed as a capstone project for the BYU MISM program. It leverages LLMs and RAG (Retrieval-Augmented Generation) to autonomously sort documents into a clean, hierarchical structure based on content analysis and historical memory.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 Sorterra uses a **LangGraph** state machine to handle complex sorting logic:
 
@@ -19,7 +19,7 @@ Sorterra uses a **LangGraph** state machine to handle complex sorting logic:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 SORTERRA-AGENT/
@@ -35,7 +35,7 @@ SORTERRA-AGENT/
 └── requirements.txt     # Dependencies
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install Dependencies
 
@@ -53,7 +53,7 @@ Place files in `data/test_folder/` and run:
 ```bash
 python main.py
 ```
-🛠️ Tech Stack
+Tech Stack
 Orchestration: LangGraph / LangChain
 
 LLM: Anthropic Claude 3.5 Sonnet

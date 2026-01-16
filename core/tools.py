@@ -16,10 +16,14 @@ class SorterraMemory:
 
     def get_similar_mapping(self, content: str):
         try:
-            results = self.db.similarity_search_with_relevance_scores(content, k=2)
-            if not results or results[0][1] < 0.4:
+            results = self.db.similarity_search_with_relevance_scores(content, k=5) 
+            
+            confident_results = [r for r in results if r[1] >= 0.4]
+            
+            if not confident_results:
                 return "No high-confidence matches in memory."
-            return "\n".join([f"Previously sorted to '{d.metadata.get('destination')}' (Conf: {s:.2f})" for d, s in results])
+                
+            return "\n".join([f"Previously sorted to '{d.metadata.get('destination')}' (Conf: {s:.2f})" for d, s in confident_results])
         except:
             return "Memory is currently empty."
 
