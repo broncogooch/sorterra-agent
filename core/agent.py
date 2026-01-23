@@ -1,75 +1,80 @@
+import os
 from typing import Literal
-from langchain_anthropic import ChatAnthropic
 from pathlib import Path
 from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
-from langgraph.graph import StateGraph, END
-from langgraph.prebuilt import ToolNode
+from langgraph.graph import StateGraph
+from langgraph.prebuilt import ToolNode, create_react_agent
 from core.schema import AgentState
-from core.tools import TOOLS, read_file_content, memory
+from core.tools import TOOLS, RLM_TOOLS, read_file_content, memory, repl_engine
 
 load_dotenv()
-# Initialize model
-model = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0).bind_tools(TOOLS)
+
+# --- Model Definitions (Updated for 2026 API) ---
+# Sonnet 4.5 is the current gold standard for agentic reasoning
+sonnet = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0)
+model_with_tools = sonnet.bind_tools(TOOLS)
+
+# --- Recursive Sub-Agent Definition ---
+# Wrapping this in a SystemMessage for better instruction persistence
+RLM_SYSTEM_PROMPT = SystemMessage(content=(
+    "You are an Extraction Specialist using a Recursive Language Model approach. "
+    "You have access to a 'context' variable in the python_repl containing document text.\n\n"
+    "STRATEGY:\n"
+    "1. Analyze the 'context' length using python_repl.\n"
+    "2. If it is large, use python_repl to chunk it (e.g., re.split by double newlines).\n"
+    "3. Use haiku_query to summarize each chunk into a list of strings.\n"
+    "4. Finally, synthesize all chunks into: Document Type, Project Identifiers, "
+    "Key Entities, and a 2-sentence overview."
+))
+
+# Instantiating the internal agent with the correct 'prompt' parameter
+analysis_sub_agent = create_react_agent(
+    model=sonnet,
+    tools=RLM_TOOLS,
+    prompt=RLM_SYSTEM_PROMPT
+)
 
 def analyzer_node(state: AgentState):
-    """Summarizes full file content and fetches memory hints."""
+    """Uses a recursive sub-agent to handle deep-analysis of large files."""
     file_path = state["current_file"]
     full_content = read_file_content.invoke(file_path)
     
-    summary_prompt = (
-        "Analyze the following document and extract key metadata for an automated sorting system. "
-        "Focus on these specific points:\n"
-        "1. Document Type: (e.g., Invoice, Project Plan, Meeting Notes, Personal List)\n"
-        "2. Project Identifiers: (Any mention of project names like 'Alpha', 'Beta', etc.)\n"
-        "3. Key Entities: (Company names, vendors, or individuals mentioned)\n"
-        "4. Brief Overview: A concise 2-sentence summary of the document's purpose.\n\n"
-        f"CONTENT:\n{full_content}"
+    # Pre-load the content into the shared REPL engine
+    repl_engine.globals["context"] = full_content
+    
+    # Run recursive agent with a 25-turn safety limit
+    recursive_result = analysis_sub_agent.invoke(
+        {"messages": [HumanMessage(content=f"Deep-analyze file: {Path(file_path).name}")]},
+        config={"recursion_limit": 25} 
     )
     
-    file_summary = model.invoke([HumanMessage(content=summary_prompt)]).content
+    last_msg = recursive_result["messages"][-1]
+    file_summary = last_msg.content
+    
+    # Log token usage for cost tracking
+    usage = getattr(last_msg, 'usage_metadata', {})
+    print(f"📊 Recursive analysis consumed {usage.get('total_tokens', '???')} tokens.")
+
     past_hints = memory.get_similar_mapping(full_content)
     
     analysis = (
         f"FILE: {Path(file_path).name}\n"
         f"EXTRACTED METADATA:\n{file_summary}\n\n"
-        f"MEMORY HINTS (PAST ACTIONS):\n{past_hints}"
+        f"PAST ACTIONS (MEMORY):\n{past_hints}"
     )
-    
     return {"analysis_summary": analysis}
 
+# --- Main Sorting Logic ---
 def sorting_agent(state: AgentState):
-    """Decides the move based on the analysis summary."""
     rules_str = "\n".join(state["recipe"]["rules"])
-    
-    system_prompt_content = (
-        "You are Sorterra, an expert file organization assistant. Your objective is to organize "
-        "the current file based on the 'Sorting Rules' and the 'Analysis Summary' provided.\n\n"
-        "### Operational Workflow:\n"
-        "1. **Sanitize Filename**: Examine the current filename. If it contains random suffixes "
-        "(e.g., '_vsj0') or is otherwise messy, use 'rename_file' to give it a clean, professional name.\n"
-        "2. **Apply Rules**: Use 'move_file' to categorize the file based strictly on the provided Rules.\n"
-        "3. **Check Memory**: Use 'MEMORY HINTS' to ensure consistency with past decisions, but "
-        "always prioritize the specific Rules if they conflict.\n\n"
-        f"### Sorting Rules:\n{rules_str}\n\n"
-        f"### Current Analysis:\n{state['analysis_summary']}\n\n"
-        "Decision Task: Choose the most appropriate action(s) to fulfill the sorting request."
-    )
-    
-    system_prompt = SystemMessage(content=system_prompt_content)
-    response = model.invoke([system_prompt] + state['messages'])
-
-    # LOGGING: Only print if there's a specific tool action or a final conclusion
-    if response.tool_calls:
-        for tool_call in response.tool_calls:
-            # Clean logging for tool selection
-            args = tool_call['args']
-            action_desc = f"{tool_call['name']}({', '.join([f'{k}={v}' for k, v in args.items()])})"
-            print(f"ACTION: {action_desc}")
-    else:
-        # Final reasoning summary
-        print(f"REASONING: {response.content.strip()}")
-
+    system_prompt = SystemMessage(content=(
+        f"You are Sorterra. Organize the file based on Rules and Analysis.\n\n"
+        f"RULES:\n{rules_str}\n\n"
+        f"ANALYSIS:\n{state['analysis_summary']}"
+    ))
+    response = model_with_tools.invoke([system_prompt] + state['messages'])
     return {"messages": [response]}
 
 def should_continue(state: AgentState) -> Literal["tools", "__end__"]:
