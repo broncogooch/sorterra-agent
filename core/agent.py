@@ -10,7 +10,8 @@ from core.tools import TOOLS, read_file_content, memory
 
 load_dotenv()
 # Initialize model
-model = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0).bind_tools(TOOLS)
+model_thinking = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0).bind_tools(TOOLS)
+model_quick = ChatAnthropic(model="claude-haiku-4-5-20251001", temperature=0)
 
 def analyzer_node(state: AgentState):
     """Summarizes full file content and fetches memory hints."""
@@ -27,7 +28,7 @@ def analyzer_node(state: AgentState):
         f"CONTENT:\n{full_content}"
     )
     
-    file_summary = model.invoke([HumanMessage(content=summary_prompt)]).content
+    file_summary = model_quick.invoke([HumanMessage(content=summary_prompt)]).content
     past_hints = memory.get_similar_mapping(full_content)
     
     analysis = (
@@ -57,7 +58,7 @@ def sorting_agent(state: AgentState):
     )
     
     system_prompt = SystemMessage(content=system_prompt_content)
-    response = model.invoke([system_prompt] + state['messages'])
+    response = model_thinking.invoke([system_prompt] + state['messages'])
 
     # LOGGING: Only print if there's a specific tool action or a final conclusion
     if response.tool_calls:
