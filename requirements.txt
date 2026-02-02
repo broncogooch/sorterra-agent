@@ -1,4 +1,4 @@
-# Core Frameworks
+# Sorterra Core
 langchain>=0.3.0
 langgraph>=0.2.0
 langchain-anthropic
@@ -7,16 +7,20 @@ langchain-community
 langchain-chroma
 python-dotenv
 
-# Document Processing & OCR
+# Document Processing & Multi-Format Support
 langchain-unstructured
 unstructured[all-docs]
-python-magic-bin; sys_platform == 'win32'
 pdf2image
 pytesseract
-
-# Format Specific Loaders (Legacy Support)
 pypdf
 docx2txt
+pandas
+pyarrow
+Pillow
+openpyxl
+python-pptx
+python-docx
 
-# Embeddings & Logic
+# Generation Support
+reportlab
 sentence-transformers

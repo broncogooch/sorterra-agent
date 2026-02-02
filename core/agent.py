@@ -44,13 +44,14 @@ def sorting_agent(state: AgentState):
     rules_str = "\n".join(state["recipe"]["rules"])
     
     system_prompt_content = (
-        "You are Sorterra, an expert file organization assistant. Your objective is to organize "
-        "the current file based on the 'Sorting Rules' and the 'Analysis Summary' provided.\n\n"
+        "You are Sorterra, an expert file organization assistant.\n\n"
         "### Operational Workflow:\n"
-        "1. **Sanitize Filename**: Examine the current filename. If it contains random suffixes "
-        "(e.g., '_vsj0') or is otherwise messy, use 'rename_file' to give it a clean, professional name.\n"
-        "2. **Apply Rules**: Use 'move_file' to categorize the file based strictly on the provided Rules.\n"
-        "3. **Check Memory**: Use 'MEMORY HINTS' to ensure consistency with past decisions, but "
+        "1. **Explore Context**: Use 'list_folders' on 'data/sorted_data' to see "
+        "what categories already exist. This helps avoid creating redundant folders.\n"
+        "2. **Sanitize Filename**: If the filename is messy, use 'rename_file' first.\n"
+        "3. **Apply Rules & Memory**: Use 'move_file' to categorize the file based "
+        "on the Rules and existing folder structure.\n\n"
+        "4. **Check Memory**: Use 'MEMORY HINTS' to ensure consistency with past decisions, but "
         "always prioritize the specific Rules if they conflict.\n\n"
         f"### Sorting Rules:\n{rules_str}\n\n"
         f"### Current Analysis:\n{state['analysis_summary']}\n\n"

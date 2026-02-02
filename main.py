@@ -4,12 +4,14 @@ from langchain_core.messages import HumanMessage
 
 TEST_FOLDER = "./data/test_folder"
 DEFAULT_RECIPE = {
-    "name": "Project Sort",
+    "name": "ACME Corp Enterprise Sort",
     "rules": [
-        "1. If file is an invoice, move to 'Finance/Invoices'.",
-        "2. If it mentions a Project (e.g. Alpha), move to 'Projects/[Name]'.",
-        "3. Otherwise, 'Unsorted'.",
-        "4. Prioritize simple and meaningul file names"
+        "1. If a file is an invoice or mentions a vendor (e.g., AWS, Stripe), move to 'Finance/Invoices/[VendorName]'.",
+        "2. If it mentions a specific Project (Alpha, Beta, Phoenix, etc.), move to 'Projects/[ProjectName]'.",
+        "3. If it is related to a specific department (HR, Marketing, Engineering) but not a project, move to 'Departments/[DepartmentName]'.",
+        "4. If it is a technical document (Technical Spec, Audit Report, SQL Database), move to 'Engineering/Technical'.",
+        "5. If it is a personal or miscellaneous item (like a Grocery List), move to 'Personal/Unsorted'.",
+        "6. Always rename files to a clean 'DocumentType_Project_Date' format if they are currently messy."
     ]
 }
 
