@@ -1,15 +1,16 @@
-# Sorterra Core
+# --- ORIGINAL SORTERRA CORE ---
 langchain>=0.3.0
 langgraph>=0.2.0
-langchain-anthropic
 langchain-huggingface
 langchain-community
 langchain-chroma
 python-dotenv
 
-# Document Processing & Multi-Format Support
+# --- ORIGINAL DOCUMENT PROCESSING (FIXED FOR 3.12) ---
+numba>=0.59.0
+llvmlite>=0.42.0
+unstructured[all-docs]>=0.12.0
 langchain-unstructured
-unstructured[all-docs]
 pdf2image
 pytesseract
 pypdf
@@ -20,7 +21,11 @@ Pillow
 openpyxl
 python-pptx
 python-docx
-
-# Generation Support
 reportlab
 sentence-transformers
+
+# --- AWS & TELEMETRY BRIDGE ---
+langchain-aws
+bedrock-agentcore
+boto3
+aws-opentelemetry-distro==0.12.2

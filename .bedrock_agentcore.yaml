@@ -1,0 +1,122 @@
+default_agent: core_agent
+agents:
+  Sorterra:
+    name: Sorterra
+    language: python
+    node_version: '20'
+    entrypoint: C:/Users/natha/sorterra/sorterra-agent/core/agent.py
+    deployment_type: container
+    runtime_type: null
+    platform: linux/arm64
+    container_runtime: none
+    source_path: C:\Users\natha\sorterra\sorterra-agent
+    aws:
+      execution_role: arn:aws:iam::896170900648:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-8ad3fdf463
+      execution_role_auto_create: false
+      account: '896170900648'
+      region: us-east-1
+      ecr_repository: 896170900648.dkr.ecr.us-east-1.amazonaws.com/bedrock-agentcore-sorterra
+      ecr_auto_create: false
+      s3_path: null
+      s3_auto_create: false
+      network_configuration:
+        network_mode: PUBLIC
+        network_mode_config: null
+      protocol_configuration:
+        server_protocol: HTTP
+      observability:
+        enabled: true
+      lifecycle_configuration:
+        idle_runtime_session_timeout: null
+        max_lifetime: null
+    bedrock_agentcore:
+      agent_id: null
+      agent_arn: null
+      agent_session_id: null
+    codebuild:
+      project_name: bedrock-agentcore-sorterra-builder
+      execution_role: arn:aws:iam::896170900648:role/AmazonBedrockAgentCoreSDKCodeBuild-us-east-1-8ad3fdf463
+      source_bucket: bedrock-agentcore-codebuild-sources-896170900648-us-east-1
+    memory:
+      mode: STM_ONLY
+      memory_id: Sorterra_mem-Mn95eaCmjO
+      memory_arn: arn:aws:bedrock-agentcore:us-east-1:896170900648:memory/Sorterra_mem-Mn95eaCmjO
+      memory_name: Sorterra_mem
+      event_expiry_days: 30
+      first_invoke_memory_check_done: true
+      was_created_by_toolkit: false
+    identity:
+      credential_providers: []
+      workload: null
+    aws_jwt:
+      enabled: false
+      audiences: []
+      signing_algorithm: ES384
+      issuer_url: null
+      duration_seconds: 300
+    authorizer_configuration: null
+    request_header_configuration: null
+    oauth_configuration: null
+    api_key_env_var_name: null
+    api_key_credential_provider_name: null
+    is_generated_by_agentcore_create: false
+  core_agent:
+    name: core_agent
+    language: python
+    node_version: '20'
+    entrypoint: C:/Users/natha/sorterra/sorterra-agent/core/agent.py
+    deployment_type: container
+    runtime_type: null
+    platform: linux/arm64
+    container_runtime: none
+    source_path: C:\Users\natha\sorterra\sorterra-agent
+    aws:
+      execution_role: arn:aws:iam::896170900648:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-5230c95186
+      execution_role_auto_create: false
+      account: '896170900648'
+      region: us-east-1
+      ecr_repository: 896170900648.dkr.ecr.us-east-1.amazonaws.com/bedrock-agentcore-core_agent
+      ecr_auto_create: false
+      s3_path: null
+      s3_auto_create: false
+      network_configuration:
+        network_mode: PUBLIC
+        network_mode_config: null
+      protocol_configuration:
+        server_protocol: HTTP
+      observability:
+        enabled: true
+      lifecycle_configuration:
+        idle_runtime_session_timeout: null
+        max_lifetime: null
+    bedrock_agentcore:
+      agent_id: core_agent-I23XY4BfLB
+      agent_arn: arn:aws:bedrock-agentcore:us-east-1:896170900648:runtime/core_agent-I23XY4BfLB
+      agent_session_id: 0316d1c6-23f2-490f-9ecb-1ef9d0e626cd
+    codebuild:
+      project_name: bedrock-agentcore-core_agent-builder
+      execution_role: arn:aws:iam::896170900648:role/AmazonBedrockAgentCoreSDKCodeBuild-us-east-1-5230c95186
+      source_bucket: bedrock-agentcore-codebuild-sources-896170900648-us-east-1
+    memory:
+      mode: STM_ONLY
+      memory_id: core_agent_mem-P43tEy3pRh
+      memory_arn: arn:aws:bedrock-agentcore:us-east-1:896170900648:memory/core_agent_mem-P43tEy3pRh
+      memory_name: core_agent_mem
+      event_expiry_days: 30
+      first_invoke_memory_check_done: true
+      was_created_by_toolkit: true
+    identity:
+      credential_providers: []
+      workload: null
+    aws_jwt:
+      enabled: false
+      audiences: []
+      signing_algorithm: ES384
+      issuer_url: null
+      duration_seconds: 300
+    authorizer_configuration: null
+    request_header_configuration: null
+    oauth_configuration: null
+    api_key_env_var_name: null
+    api_key_credential_provider_name: null
+    is_generated_by_agentcore_create: false
